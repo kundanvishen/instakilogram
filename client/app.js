@@ -5,18 +5,18 @@ angular.module('InstaKilogram', ['ngRoute', 'ngMessages', 'satellizer'])
                 templateUrl: 'views/home.html',
                 controller: 'HomeCtrl'
             })
-            .when('/', {
+            .when('/login', {
                 templateUrl: 'views/login.html',
                 controller: 'LoginCtrl'
             })
-            // .when('/', {
-            //     templateUrl: 'views/signup.html',
-            //     controller: 'SignupCtrl'
-            // })
-            // .when('/photo/:id', {
-            //     templateUrl: 'views/detail.html',
-            //     controller: 'DetailCtrl'
-            // })
+            .when('/signup', {
+                templateUrl: 'views/signup.html',
+                controller: 'SignupCtrl'
+            })
+            .when('/photo/:id', {
+                templateUrl: 'views/detail.html',
+                controller: 'DetailCtrl'
+            })
             .otherwise('/');
 
         $authProvider.loginUrl = 'http://localhost:3000/auth/login';

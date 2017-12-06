@@ -1,5 +1,5 @@
 angular.module('InstaKilogram')
-    .controller('LoginCtrl', function($scope, $window, $location, $routeScope, $auth) {
+    .controller('LoginCtrl', function($scope, $window, $location, $rootScope, $auth) {
         $scope.instagramLogin = function() {
             $auth.authenticate('instagram')
                 .then(function(response) {

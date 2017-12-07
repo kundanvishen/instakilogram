@@ -1,4 +1,17 @@
 angular.module('InstaKilogram')
-	.controller('SignupCtrl', function ($scope, $window, $rootScope, $auth) {
-		console.log('Navbar Controller');
+	.controller('SignupCtrl', function ($scope, $auth) {
+
+		$scope.signup = function () {
+			var user = {
+				email: $scope.email,
+				password: $scope.password
+			};
+
+			// Satellizer
+			$auth.signup(user)
+				.catch(function (response) {
+					console.log(response.data);
+				});
+		}; // $scope.signup
+
 	});

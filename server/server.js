@@ -61,7 +61,28 @@ function isAuthenticated(req, res, next) {
 		req.user = user;
 		next();
 	})
-}
+} // isAuthenticated()
+
+app.post('/auth/login', function(req, res){
+	// The +password parameter in the query tells Mongoose to include the password field. We have to do this because we explicitly told Mongoose to exclude the password field from all User mod
+	User.findOne({email: req.body.email}, '+password', function(err, user){
+		if(!user) {
+			return res.status(401).send({message: 'Incorrect email'});
+		}
+
+		bcrypt.compare(req.body.password, user.password, function(err, isMatch){
+			if(!isMatch) {
+				return res.status(401).send({message: 'Incorrect Password'});
+			}
+
+			user = user.toObject();
+			delete user.password;
+
+			var token = createToken(user);
+			res.send({token: token, user: user});
+		});
+	});
+});
 
 app.listen(app.get('port'), function () {
 	console.log('Express server listening on port ' + app.get('port'));

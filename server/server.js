@@ -97,8 +97,62 @@ app.post('/auth/instagram', function(req, res){
 	request.post({url: accessTokenUrl, form: params, json: true}, function(e, r, body) {
 		if(req.headers.authorization) {
 			// link user accounts
+			User.findOne({instagramId: body.user.id}, function(err, existingUser){
+				var token = req.headers.authorization.split(' ')[1];
+				var payload = jwt.decode(token, config.tokenSecret);
+
+				User.findById(payload.sub, '+password', function(err, localUser){
+					if(!localUser){
+						return res.status(400).send({message: 'User not found'});
+					}
+
+					// Merge two accounts.
+					if(existingUser) {
+						existingUser.email = localUser.email;
+						existingUser.password = localUser.password;
+
+						localUser.remove();
+
+						existingUser.save(function(){
+							var token = createToken(existingUser);
+							return res.send({token: token, user: existingUser});
+						})
+					} else {
+						// link current email account with the Instagram Profile Information
+						localUser.instagramId = body.user.id;
+						localUser.username = body.user.username;
+						localUser.fullName = body.user.full_name;
+						localUser.picture = body.user.profile_picture;
+						localUser.accessToken = body.access_token;
+
+						localUser.save(function(){
+							var token = createToken(localUser);
+							res.send({token: token,user: localUser});
+						});
+					}
+				})
+			})
 		} else {
-			// create new user account
+			// create new user account or return an existing one
+			User.findOne({instagramId: req.body.user.id}, function(err, existingUser){
+				if(existingUser) {
+					var token = createToken(existingUser);
+					return res.send({token: token, user: existingUser});
+				}
+
+				var user = new User({
+					instagramId: body.user.id,
+					username: body.user.username,
+					fullName: body.user.full_name,
+					picture: body.user.profile_picture,
+					accessToken: body.access_token
+				});
+
+				user.save(function(){
+					var token = createToken(user);
+					res.send({token: token, user: user});
+				});
+			}); // User.findOne()
 		}
 	})
 });

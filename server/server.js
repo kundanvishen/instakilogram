@@ -84,6 +84,29 @@ app.post('/auth/login', function(req, res){
 	});
 }); // auth/login
 
+app.post('/auth/signup', function(req, res){
+	User.findOne({email: req.body.email}, function(err, existingUser){
+		if(existingUser) {
+			res.status(409).send({message: 'Email is already taken'});
+		}
+
+		var user = new User({
+			email: body.req.email,
+			password: body.req.password
+		});
+
+		bcrypt.genSalt(10, function(err, salt){
+			bcrypt.hash(user.password, salt, function(err, hash){
+				user.password = hash;
+				user.save(function(){
+					var token = createToken(user)
+					res.send({token: token, user: user});
+				});
+			});
+		});
+	});
+});
+
 app.post('/auth/instagram', function(req, res){
 	var accessTokenUrl = 'https://api.instagram.com/oauth/access_token';
 	var params = {

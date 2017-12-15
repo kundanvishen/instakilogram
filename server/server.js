@@ -91,8 +91,8 @@ app.post('/auth/signup', function(req, res){
 		}
 
 		var user = new User({
-			email: body.req.email,
-			password: body.req.password
+			email: req.body.email,
+			password: req.body.password
 		});
 
 		bcrypt.genSalt(10, function(err, salt){
@@ -117,7 +117,7 @@ app.post('/auth/instagram', function(req, res){
 		grant_type: 'authorization_code'
 	};
 
-	request.post({url: accessTokenUrl, form: params, json: true}, function(e, r, body) {
+	request.post({url: accessTokenUrl, form: params, json: true}, function(error, response, body) {
 		if(req.headers.authorization) {
 			// link user accounts
 			User.findOne({instagramId: body.user.id}, function(err, existingUser){
@@ -180,7 +180,7 @@ app.post('/auth/instagram', function(req, res){
 	})
 });
 
-app.post('/api/feed', function(req, res){
+app.get('/api/feed', function(req, res){
 	var feedUrl = 'https://api.instagram.com/v1/users/self/feed';
 	var params = {access_token: req.user.token};
 
@@ -214,6 +214,6 @@ app.listen(app.get('port'), function () {
 	console.log('Express server listening on port ' + app.get('port'));
 });
 
-app.get('*', function(req, res){
-	res.send('Listening')
-})
+// app.get('*', function(req, res){
+// 	res.send('Listening')
+// })

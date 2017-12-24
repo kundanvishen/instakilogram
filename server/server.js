@@ -170,7 +170,7 @@ app.post('/auth/instagram', function(req, res){
 					picture: body.user.profile_picture,
 					accessToken: body.access_token
 				});
-
+				
 				user.save(function(){
 					var token = createToken(user);
 					res.send({token: token, user: user});
